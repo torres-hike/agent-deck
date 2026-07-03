@@ -103,6 +103,22 @@ class TestBuildDiscordContextTag(unittest.TestCase):
             "[from:alice (987654321)] [thread:#secret (791) in #ops]",
         )
 
+    def test_news_thread_includes_parent(self):
+        """Announcement (news) threads use the same [thread:...] shape."""
+        m = _msg(
+            SimpleNamespace(display_name="alice", name="alice_x", id=987654321),
+            SimpleNamespace(
+                type=discord.ChannelType.news_thread,
+                name="release-notes",
+                id=792,
+                parent=SimpleNamespace(name="announcements"),
+            ),
+        )
+        self.assertEqual(
+            build_discord_context_tag(m),
+            "[from:alice (987654321)] [thread:#release-notes (792) in #announcements]",
+        )
+
     def test_thread_missing_parent_falls_back_to_question_mark(self):
         """When a thread's parent can't be resolved, parent renders as '?'."""
         m = _msg(
